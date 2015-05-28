@@ -7188,7 +7188,7 @@ gg::GgObj::~GgObj()
   delete[] diff;
   delete[] spec;
   delete[] shi;
-  delete[] data;
+  delete data;
 }
 
 /*
