@@ -12,14 +12,14 @@ class Window
 	// ウィンドウの識別子
 	GLFWwindow *const window;
 
-  // モデルビュー変換行列
-  GgMatrix mw;
+  // 視野変換行列
+  GgMatrix mv;
 
-  // 透視投影変換行列
+  // 影変換行列
 	GgMatrix mp;
 
-  // ドラッグ開始位置
-  double cx, cy;
+  // トラックボール処理
+  GgTrackball ltb, rtb;
 
 	// タイプしたキー
 	int key;
@@ -45,19 +45,19 @@ public:
   }
 
   //
+  // ウィンドウを閉じるべきかを判定する
+  //
+  //   ・描画ループの継続条件として使う
+  //
+  int shouldClose() const;
+
+  //
   // 画面クリア
   //
   //   ・図形の描画開始前に呼び出す
   //   ・画面の消去などを行う
   //
   void clear();
-
-  //
-  // ウィンドウを閉じるべきかを判定する
-  //
-  //   ・描画ループの継続条件として使う
-  //
-  int shouldClose() const;
 
   //
   // カラーバッファを入れ替えてイベントを取り出す
@@ -98,15 +98,15 @@ public:
   static void wheel(GLFWwindow *window, double x, double y);
 
   //
-  // モデルビュー変換行列を得る
+  // 視野変換行列を得る
   //
-  const GgMatrix &getMw() const
+  const GgMatrix &getMv() const
   {
-    return mw;
+    return mv;
   }
 
   //
-  // プロジェクション変換行列を得る
+  // 投影変換行列を得る
   //
   const GgMatrix &getMp() const
   {
@@ -128,4 +128,20 @@ public:
 	{
 		return glfwGetKey(window, key);
 	}
+
+  //
+  // 左ボタンのトラックボールの変換行列を取り出す
+  //
+  const GLfloat *getLtb() const
+  {
+    return ltb.get();
+  }
+
+  //
+  // 右ボタンのトラックボールの変換行列を取り出す
+  //
+  const GLfloat *getRtb() const
+  {
+    return rtb.get();
+  }
 };

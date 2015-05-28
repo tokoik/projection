@@ -1,11 +1,20 @@
 #version 150 core
 #extension GL_ARB_explicit_attrib_location : enable
 
-uniform sampler2DRect image;
+// テクスチャ
+uniform sampler2DRect image;                        // オブジェクトへの投影像
 
-layout (location = 0) out vec4 fc;
+// ラスタライザから受け取る頂点属性の補間値
+in vec4 iamb;                                       // 環境光の反射光強度
+in vec4 idiff;                                      // 拡散反射光強度
+in vec4 ispec;                                      // 鏡面反射光強度
+in vec4 texcoord;                                   // テクスチャ座標
 
-void main()
+// フレームバッファに出力するデータ
+layout (location = 0) out vec4 fc;                  // フラグメントの色
+
+void main(void)
 {
-  fc = texture(image, gl_FragCoord.xy);
+  vec2 t = textureSize(image) * (1.5 * texcoord.xy / texcoord.w + 0.5);
+  fc = (iamb + idiff) * texture(image, t) + ispec;
 }

@@ -47,6 +47,9 @@ Window::Window(const char *title, int width, int height)
 
   // ウィンドウの設定を初期化する
   resize(window, width, height);
+
+  // 視野変換行列を設定する
+  mv.loadTranslate(0.0f, 0.0f, -5.0f);
 }
 
 //
@@ -55,6 +58,16 @@ Window::Window(const char *title, int width, int height)
 Window::~Window()
 {
   glfwDestroyWindow(window);
+}
+
+//
+// ウィンドウを閉じるべきかを判定する
+//
+//   ・描画ループの継続条件として使う
+//
+int Window::shouldClose() const
+{
+  return glfwWindowShouldClose(window) | glfwGetKey(window, GLFW_KEY_ESCAPE);
 }
 
 //
@@ -67,16 +80,6 @@ void Window::clear()
 {
   // 画面クリア
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-//
-// ウィンドウを閉じるべきかを判定する
-//
-//   ・描画ループの継続条件として使う
-//
-int Window::shouldClose() const
-{
-  return glfwWindowShouldClose(window) | glfwGetKey(window, GLFW_KEY_ESCAPE);
 }
 
 //
@@ -96,6 +99,28 @@ void Window::swapBuffers()
 
   // イベントを取り出す
   glfwPollEvents();
+
+  // 左ボタンドラッグ
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+  {
+    // マウスの現在位置を取得する
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    // トラックボール処理
+    ltb.motion(static_cast<float>(x), static_cast<float>(y));
+  }
+
+  // 右ボタンドラッグ
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+  {
+    // マウスの現在位置を取得する
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    // トラックボール処理
+    rtb.motion(static_cast<float>(x), static_cast<float>(y));
+  }
 }
 
 //
@@ -114,8 +139,12 @@ void Window::resize(GLFWwindow *window, int width, int height)
 
   if (instance != NULL)
   {
-    // 透視投影変換行列を求める（アスペクト比 w / h）
+    // 投影変換行列を設定する
     instance->mp.loadPerspective(0.5f, (float)width / (float)height, 1.0f, 20.0f);
+
+    // トラックボール処理の範囲を設定する
+    instance->ltb.region(width, height);
+    instance->rtb.region(width, height);
   }
 }
 
@@ -155,22 +184,34 @@ void Window::mouse(GLFWwindow *window, int button, int action, int mods)
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
-    // マウスを押したときなら
-    if (action)
-    {
-      // ドラッグ開始位置を保存する
-      instance->cx = x;
-      instance->cy = y;
-    }
-
     // 押されたボタンの判定
     switch (button)
     {
     case GLFW_MOUSE_BUTTON_1:
       // 左ボタンを押した時の処理
+      if (action)
+      {
+        // トラックボール処理開始
+        instance->ltb.start(static_cast<float>(x), static_cast<float>(y));
+      }
+      else
+      {
+        // トラックボール処理終了
+        instance->ltb.stop(static_cast<float>(x), static_cast<float>(y));
+      }
       break;
     case GLFW_MOUSE_BUTTON_2:
       // 右ボタンを押した時の処理
+      if (action)
+      {
+        // トラックボール処理開始
+        instance->rtb.start(static_cast<float>(x), static_cast<float>(y));
+      }
+      else
+      {
+        // トラックボール処理終了
+        instance->rtb.stop(static_cast<float>(x), static_cast<float>(y));
+      }
       break;
     case GLFW_MOUSE_BUTTON_3:
       // 中ボタンを押した時の処理

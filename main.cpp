@@ -17,6 +17,21 @@
 //
 #include "Window.h"
 
+// 形状データファイル名
+const char model[] = "bunny.obj";
+
+// 光源
+const GgSimpleShader::Light light =
+{
+  { 0.2f, 0.2f, 0.2f, 1.0f },
+  { 1.0f, 1.0f, 1.0f, 1.0f },
+  { 1.0f, 1.0f, 1.0f, 1.0f },
+  { 2.0f, 9.0f, 3.0f, 1.0f }
+};
+
+// アニメーションの周期（秒）
+const double cycle(10.0);
+
 //
 // プログラム終了時の処理
 //
@@ -31,12 +46,17 @@ static void cleanup()
 //
 int main()
 {
+  //
+  // OpenCV の設定
+  //
+
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(CV_CAP_ANY);
+  cv::VideoCapture camera(1);
   if (!camera.isOpened())
   {
-    std::cerr << "cannot open input" << std::endl;
-    exit(1);
+    // カメラが使えなかった
+    std::cerr << "Can't open camera." << std::endl;
+    return 1;
   }
   
   // カメラの初期設定
@@ -44,6 +64,10 @@ int main()
   const GLsizei capture_width(GLsizei(camera.get(CV_CAP_PROP_FRAME_WIDTH)));
   const GLsizei capture_height(GLsizei(camera.get(CV_CAP_PROP_FRAME_HEIGHT)));
   
+  //
+  // GLFW の設定
+  //
+
   // GLFW を初期化する
   if (glfwInit() == GL_FALSE)
   {
@@ -72,32 +96,46 @@ int main()
     return 1;
   }
 
+  //
+  // シェーダの設定
+  //
+
+  // シェーダを読み込む
+  GgSimpleShader simple("simple.vert", "simple.frag");
+
+  // シェーダが読み込めたか確認する
+  if (!simple.get()) return 1;
+
+  // テクスチャのサンプラの場所を取り出す
+  const GLuint imageLoc(glGetUniformLocation(simple.get(), "image"));
+
+  // テクスチャ変換行列の場所を取り出す
+  const GLuint mtLoc(glGetUniformLocation(simple.get(), "mt"));
+
+  //
+  // 描画データの設定
+  //
+
+  // 図形を読み込む
+  GgObj obj(model, true);
+  
+  // 図形が読み込めたか確認する
+  if (!obj.get()) return 1;
+
+  // 読み込んだ図形を描くシェーダを指定する
+  obj.attachShader(simple);
+
+  //
+  // OpenGL の設定
+  //
+
   // 背景色を指定する
   glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-  
-  // 頂点配列オブジェクト
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-  
-  // 頂点バッファオブジェクト
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  
-  // 図形の読み込み
-  static const GLfloat position[][2] =
-  {
-    { -1.0f, -1.0f },
-    {  1.0f, -1.0f },
-    {  1.0f,  1.0f },
-    { -1.0f,  1.0f }
-  };
-  static const int vertices(sizeof position / sizeof position[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof position, position, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(0);
-  
+
+  // 隠面消去を有効にする
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
+
   // テクスチャを準備する
   GLuint image;
   glGenTextures(1, &image);
@@ -108,12 +146,14 @@ int main()
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-  // プログラムオブジェクトの作成
-  const GLuint program(ggLoadShader("simple.vert", "simple.frag"));
+  // テクスチャの境界色を指定する
+  const GLfloat border[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+  glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, border);
 
-  // uniform 変数のインデックスの検索（見つからなければ -1）
-  const GLuint imageLoc(glGetUniformLocation(program, "image"));
-  
+  //
+  // 描画
+  //
+
   // ウィンドウが開いている間繰り返す
   while (window.shouldClose() == GL_FALSE)
   {
@@ -130,27 +170,28 @@ int main()
       glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, frame.cols, flipped.rows, GL_BGR, GL_UNSIGNED_BYTE, flipped.data);
     }
 
-    // シェーダプログラムの使用開始
-    glUseProgram(program);
-    
-    // uniform サンプラの指定
+    // 画面を消去する
+    window.clear();
+
+    // シェーダを選択する
+    obj.getShader()->use();
+
+    // 光源位置を指定する
+    obj.getShader()->setLight(light);
+
+    // 変換行列を設定する
+    obj.getShader()->loadMatrix(window.getMp(), window.getMv() * window.getLtb());
+
+    // テクスチャ変換行列を設定する
+    glUniformMatrix4fv(mtLoc, 1, GL_FALSE, window.getRtb());
+
+    // テクスチャユニットを指定する
     glUniform1i(imageLoc, 0);
-    
-    // テクスチャユニットとテクスチャの指定
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_RECTANGLE, image);
     
-    // 描画に使う頂点配列オブジェクトの指定
-    glBindVertexArray(vao);
-    
-    // 図形の描画
-    glDrawArrays(GL_TRIANGLE_FAN, 0, vertices);
-    
-    // 頂点配列オブジェクトの指定解除
-    glBindVertexArray(0);
-    
-    // シェーダプログラムの使用終了
-    glUseProgram(0);
+    // 図形を描画する
+    obj.draw();
 
     // カラーバッファを入れ替えてイベントを取り出す
     window.swapBuffers();

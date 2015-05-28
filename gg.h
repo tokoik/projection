@@ -5508,6 +5508,20 @@ namespace gg
     //! \brief コンストラクタ.
     GgObj(const char *name, bool normalize = false);
 
+    //! \brief 形状データの取り出し.
+    //!   \return GgTriangles 型の形状データのポインタ.
+    const GgTriangles *get()
+    {
+      return data;
+    }
+
+    //! \brief シェーダの取り出し.
+    //!   \return GgSimpleShader 型のシェーダのポインタ.
+    GgSimpleShader *getShader() const
+    {
+      return shader;
+    }
+
     //! \brief シェーダの割り当て.
     //!   \param shader GgSimpleShader 型のシェーダ.
     void attachShader(GgSimpleShader &shader)
