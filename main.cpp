@@ -29,9 +29,6 @@ const GgSimpleShader::Light light =
   { 2.0f, 9.0f, 3.0f, 1.0f }
 };
 
-// アニメーションの周期（秒）
-const double cycle(10.0);
-
 //
 // プログラム終了時の処理
 //
@@ -51,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(1);
+  cv::VideoCapture camera(0);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
