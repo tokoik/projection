@@ -16,5 +16,5 @@ layout (location = 0) out vec4 fc;                  // フラグメントの色
 void main(void)
 {
   vec2 t = textureSize(image) * (1.5 * texcoord.xy / texcoord.w + 0.5);
-  fc = (iamb + idiff) * texture(image, t) + ispec;
+  fc = iamb + (idiff + ispec) * texture(image, t);
 }

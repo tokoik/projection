@@ -26,7 +26,7 @@ const GgSimpleShader::Light light =
   { 0.2f, 0.2f, 0.2f, 1.0f },
   { 1.0f, 1.0f, 1.0f, 1.0f },
   { 1.0f, 1.0f, 1.0f, 1.0f },
-  { 2.0f, 9.0f, 3.0f, 1.0f }
+  { 0.0f, 0.0f, 0.0f, 1.0f }
 };
 
 //
@@ -144,7 +144,7 @@ int main()
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
   // テクスチャの境界色を指定する
-  const GLfloat border[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+  const GLfloat border[] = { 0.1f, 0.1f, 0.1f, 1.0f };
   glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, border);
 
   //
