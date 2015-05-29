@@ -3,7 +3,7 @@ SOURCES	= $(wildcard *.cpp)
 HEADERS	= $(wildcard *.h)
 OBJECTS	= $(patsubst %.cpp,%.o,$(SOURCES))
 CXXFLAGS	= --std=c++0x -Wall -DX11
-LDLIBS	= -lGL -lglfw3 -lXrandr -lXinerama -lXcursor -lXxf86vm -lX11 -lopencv_highgui -lopencv_core -lpthread -lm
+LDLIBS	= -lGL -lglfw3 -lXrandr -lXinerama -lXcursor -lXxf86vm -lXi -lX11 -lopencv_highgui -lopencv_core -lpthread -lm
 
 .PHONY: clean
 
