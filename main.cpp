@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(0);
+  cv::VideoCapture camera(1);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
@@ -180,7 +180,7 @@ int main()
     obj.getShader()->loadMatrix(window.getMp(), window.getMv() * window.getLtb());
 
     // テクスチャ変換行列を設定する
-    glUniformMatrix4fv(mtLoc, 1, GL_FALSE, window.getRtb());
+    glUniformMatrix4fv(mtLoc, 1, GL_TRUE, window.getRtb());
 
     // テクスチャユニットを指定する
     glUniform1i(imageLoc, 0);
