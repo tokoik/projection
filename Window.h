@@ -21,6 +21,9 @@ class Window
   // トラックボール処理
   GgTrackball ltb, rtb;
 
+  // 投影像のスケール
+  double scale;
+  
 	// タイプしたキー
 	int key;
 
@@ -128,6 +131,13 @@ public:
 	{
 		return glfwGetKey(window, key);
 	}
+
+  //
+  // 現在のスケールを取り出す
+  GLfloat getScale() const
+  {
+    return GLfloat(scale);
+  }
 
   //
   // 左ボタンのトラックボールの変換行列を取り出す

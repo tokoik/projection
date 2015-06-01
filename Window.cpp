@@ -16,7 +16,7 @@
 //    height: 開くウィンドウの高さ
 //
 Window::Window(const char *title, int width, int height)
-  : window(glfwCreateWindow(width, height, title, NULL, NULL)), key(0)
+  : window(glfwCreateWindow(width, height, title, NULL, NULL)) , key(0), scale(1.5)
 {
   // ウィンドウが作成できなかったらそのまま戻る
   if (window == NULL) return;
@@ -242,6 +242,7 @@ void Window::wheel(GLFWwindow *window, double x, double y)
     else
     {
       // 上下に移動する
+      instance->scale += 0.01 * y;
     }
   }
 }

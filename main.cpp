@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(1);
+  cv::VideoCapture camera(0);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
@@ -106,6 +106,9 @@ int main()
   // 投影する映像のテクスチャのサンプラの場所を取り出す
   const GLuint imageLoc(glGetUniformLocation(simple.get(), "image"));
 
+  // 投影する映像のテクスチャのスケールの場所を取り出す
+  const GLuint scaleLoc(glGetUniformLocation(simple.get(), "scale"));
+  
   // シャドウマップのテクスチャのサンプラの場所を取り出す
   const GLuint depthLoc(glGetUniformLocation(simple.get(), "depth"));
 
@@ -125,8 +128,23 @@ int main()
   // 描画データの設定
   //
 
+  class ProjectedObj
+    : public GgObj
+  {
+  public:
+
+    // コンストラクタ
+    ProjectedObj(const char *name, bool normalize = false)
+      : GgObj(name, normalize) {}
+
+    // デストラクタ
+    virtual ~ProjectedObj() {}
+
+    // シャドウマップへの描画
+  };
+
   // 図形を読み込む
-  GgObj obj(model, true);
+  ProjectedObj obj(model, true);
   
   // 図形が読み込めたか確認する
   if (!obj.get()) return 1;
@@ -199,10 +217,8 @@ int main()
       camera.retrieve(frame, 3);
 
       // 切り出した画像をテクスチャに転送する
-      cv::Mat flipped;
-      cv::flip(frame, flipped, 0);
       glBindTexture(GL_TEXTURE_RECTANGLE, image);
-      glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, frame.cols, flipped.rows, GL_BGR, GL_UNSIGNED_BYTE, flipped.data);
+      glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, frame.cols, frame.rows, GL_BGR, GL_UNSIGNED_BYTE, frame.data);
     }
 
     // 描画先をフレームバッファオブジェクトに切り替える
@@ -235,6 +251,9 @@ int main()
     glUniform1i(imageLoc, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_RECTANGLE, image);
+    
+    // 投影する映像のスケールを設定する
+    glUniform2f(scaleLoc, window.getScale(), -window.getScale());
     
     // シャドウマップのテクスチャユニットを指定する
     glUniform1i(depthLoc, 1);

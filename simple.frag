@@ -1,8 +1,11 @@
 #version 150 core
 #extension GL_ARB_explicit_attrib_location : enable
 
-// テクスチャ
-uniform sampler2DRect image;                        // オブジェクトへの投影像
+// 投影像のテクスチャ
+uniform sampler2DRect image;
+
+// テクスチャのスケール
+uniform vec2 scale;
 
 // ラスタライザから受け取る頂点属性の補間値
 in vec4 iamb;                                       // 環境光の反射光強度
@@ -15,6 +18,6 @@ layout (location = 0) out vec4 fc;                  // フラグメントの色
 
 void main(void)
 {
-  vec2 t = textureSize(image) * (1.5 * texcoord.xy / texcoord.w + 0.5);
+  vec2 t = textureSize(image) * (scale * texcoord.xy / texcoord.w + 0.5);
   fc = iamb + (idiff + ispec) * texture(image, t);
 }
