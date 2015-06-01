@@ -97,17 +97,29 @@ int main()
   // シェーダの設定
   //
 
-  // シェーダを読み込む
+  // 描画用のシェーダを読み込む
   GgSimpleShader simple("simple.vert", "simple.frag");
 
-  // シェーダが読み込めたか確認する
+  // 描画用のシェーダが読み込めたか確認する
   if (!simple.get()) return 1;
 
-  // テクスチャのサンプラの場所を取り出す
+  // 投影する映像のテクスチャのサンプラの場所を取り出す
   const GLuint imageLoc(glGetUniformLocation(simple.get(), "image"));
+
+  // シャドウマップのテクスチャのサンプラの場所を取り出す
+  const GLuint depthLoc(glGetUniformLocation(simple.get(), "depth"));
 
   // テクスチャ変換行列の場所を取り出す
   const GLuint mtLoc(glGetUniformLocation(simple.get(), "mt"));
+
+  // シャドウマップ作成用のシェーダを読み込む
+  GgSimpleShader shadow("simple.vert", "simple.frag");
+
+  // シャドウマップ作成用のシェーダが読み込めたか確認する
+  if (!shadow.get()) return 1;
+
+  // シャドウマップ作成用の変換行列の場所を取り出す
+  const GLuint msLoc(glGetUniformLocation(simple.get(), "ms"));
 
   //
   // 描画データの設定
@@ -133,19 +145,45 @@ int main()
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
 
-  // テクスチャを準備する
+  // 投影する画像を保存するテクスチャを準備する
   GLuint image;
   glGenTextures(1, &image);
   glBindTexture(GL_TEXTURE_RECTANGLE, image);
-  glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, capture_width, capture_height, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, capture_width, capture_height, 0, GL_BGR, GL_UNSIGNED_BYTE, nullptr);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
   // テクスチャの境界色を指定する
-  const GLfloat border[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-  glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, border);
+  const GLfloat borderColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+  glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+  // シャドウマップを取得する FBO 用のテクスチャを準備する
+  GLuint depth;
+  glGenTextures(1, &depth);
+  glBindTexture(GL_TEXTURE_RECTANGLE, depth);
+  glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT, capture_width, capture_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+  glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+  // テクスチャの境界深度を指定する (最初の要素が使われる)
+  const GLfloat borderDepth[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderDepth);
+
+  // 書き込むポリゴンのテクスチャ座標値の r 要素とテクスチャとの比較を行うようにする
+  glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+
+  // もし r 要素の値がテクスチャの値以下なら真 (つまり日向)
+  glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+  // シャドウマップを取得する FBO 用を準備する
+  GLuint fb;
+  glGenFramebuffers(1, &fb);
+  glBindFramebuffer(GL_FRAMEBUFFER, fb);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE, depth, 0);
 
   //
   // 描画
@@ -167,26 +205,42 @@ int main()
       glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, frame.cols, flipped.rows, GL_BGR, GL_UNSIGNED_BYTE, flipped.data);
     }
 
+    // 描画先をフレームバッファオブジェクトに切り替える
+    glBindFramebuffer(GL_FRAMEBUFFER, fb);
+
+    // カラーバッファは無いので読み書きしない
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    // デプスバッファだけを消去する
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // 描画先を通常のフレームバッファに切り替える
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // カラーバッファへの読み書きを有効にする
+    glDrawBuffer(GL_BACK);
+    glReadBuffer(GL_BACK);
+
     // 画面を消去する
     window.clear();
 
     // シェーダを選択する
-    obj.getShader()->use();
-
-    // 光源位置を指定する
-    obj.getShader()->setLight(light);
-
-    // 変換行列を設定する
-    obj.getShader()->loadMatrix(window.getMp(), window.getMv() * window.getLtb());
+    obj.getShader()->use(light, window.getMp(), window.getMv() * window.getLtb());
 
     // テクスチャ変換行列を設定する
     glUniformMatrix4fv(mtLoc, 1, GL_TRUE, window.getRtb());
 
-    // テクスチャユニットを指定する
+    // 投影する映像のテクスチャユニットを指定する
     glUniform1i(imageLoc, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_RECTANGLE, image);
     
+    // シャドウマップのテクスチャユニットを指定する
+    glUniform1i(depthLoc, 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_RECTANGLE, depth);
+
     // 図形を描画する
     obj.draw();
 
