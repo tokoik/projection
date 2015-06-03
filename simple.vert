@@ -1,8 +1,11 @@
 #version 150 core
 #extension GL_ARB_explicit_attrib_location : enable
 
-// テクスチャ
-uniform sampler2DRect image;                        // オブジェクトへの投影像
+// シャドウマップ
+uniform sampler2DRectShadow shadow;
+
+// 投影像のテクスチャ
+uniform sampler2DRect image;
 
 // 光源
 uniform vec4 lamb;                                  // 環境光成分
@@ -30,7 +33,8 @@ layout (location = 1) in vec4 nv;                   // 頂点の法線ベクトル
 out vec4 iamb;                                      // 環境光の反射光強度
 out vec4 idiff;                                     // 拡散反射光強度
 out vec4 ispec;                                     // 鏡面反射光強度
-out vec4 texcoord;                                  // テクスチャ座標
+out vec2 tcoord;                                    // 投影像のテクスチャ座標
+out vec3 scoord;                                    // シャドウマップのテクスチャ座標
 
 void main(void)
 {
@@ -46,8 +50,14 @@ void main(void)
   idiff = max(dot(n, l), 0.0) * kdiff * ldiff;
   ispec = pow(max(dot(n, h), 0.0), kshi) * kspec * lspec;
 
-  // テクスチャ座標
-  texcoord = mt * pv;
+  // 投影像のスクリーン座標
+  vec4 t = mt * pv;
 
+  // 投影像のテクスチャ座標
+  tcoord = textureSize(image) * (t.xy / t.w + 0.5);
+  
+  // シャドウマップのテクスチャ座標
+  scoord = vec3(tcoord, t.z / t.w);
+  
   gl_Position = mc * pv;
 }

@@ -78,6 +78,9 @@ int Window::shouldClose() const
 //
 void Window::clear()
 {
+  // ビューポートを設定する
+  glViewport(0, 0, width, height);
+
   // 画面クリア
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -139,6 +142,10 @@ void Window::resize(GLFWwindow *window, int width, int height)
 
   if (instance != NULL)
   {
+    // ビューポートを保存する
+    instance->width = width;
+    instance->height = height;
+    
     // 投影変換行列を設定する
     instance->mp.loadPerspective(0.5f, (float)width / (float)height, 1.0f, 20.0f);
 

@@ -21,6 +21,9 @@ class Window
   // トラックボール処理
   GgTrackball ltb, rtb;
 
+  // ビューポートのサイズ
+  int width, height;
+  
   // 投影像のスケール
   double scale;
   

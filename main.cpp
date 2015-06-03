@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(1);
+  cv::VideoCapture camera(0);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
@@ -106,9 +106,6 @@ int main()
   // 投影する映像のテクスチャのサンプラの場所を取り出す
   const GLuint imageLoc(glGetUniformLocation(simple.get(), "image"));
 
-  // 投影する映像のテクスチャのスケールの場所を取り出す
-  const GLuint scaleLoc(glGetUniformLocation(simple.get(), "scale"));
-  
   // シャドウマップのテクスチャのサンプラの場所を取り出す
   const GLuint depthLoc(glGetUniformLocation(simple.get(), "depth"));
 
@@ -207,6 +204,9 @@ int main()
       glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, frame.cols, frame.rows, GL_BGR, GL_UNSIGNED_BYTE, frame.data);
     }
 
+    // スケーリングしたシャドウマップの変換行列
+    const GgMatrix ms(ggScale(window.getScale(), -window.getScale(), 1.0) * mt);
+    
     // 描画先をフレームバッファオブジェクトに切り替える
     glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
@@ -216,10 +216,20 @@ int main()
 
     // デプスバッファだけを消去する
     glClear(GL_DEPTH_BUFFER_BIT);
+    
+    // ビューポートをシャドウマップのサイズに設定する
+    glViewport(0, 0, capture_width, capture_height);
 
-    // フレームバッファオブジェクトに描画する
+    // シャドウマップ用のシェーダを選択する
     shadow.use();
+    
+    // シャドウマップ用のテクスチャ変換行列を設定する
+    glUniformMatrix4fv(msLoc, 1, GL_FALSE, ms.get());
+    
+    // オブジェクトのマテリアル設定は行わない
     obj.attachShader(nullptr);
+
+    // シャドウマップ用のフレームバッファオブジェクトに描画する
     obj.draw();
 
     // 描画先を通常のフレームバッファに切り替える
@@ -232,22 +242,19 @@ int main()
     // 画面を消去する
     window.clear();
 
-    // シェーダを選択する
+    // 描画用のシェーダを選択する
     simple.use(light, window.getMp(), window.getMv() * window.getLtb());
 
-    // 図形を描くシェーダを指定する
+    // オブジェクトのマテリアル設定を行う
     obj.attachShader(simple);
-
-    // テクスチャ変換行列を設定する
-    glUniformMatrix4fv(mtLoc, 1, GL_FALSE, mt.get());
+    
+    // 投影像のテクスチャ変換行列を設定する
+    glUniformMatrix4fv(mtLoc, 1, GL_FALSE, ms.get());
 
     // 投影する映像のテクスチャユニットを指定する
     glUniform1i(imageLoc, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_RECTANGLE, image);
-    
-    // 投影する映像のスケールを設定する
-    glUniform2f(scaleLoc, window.getScale(), -window.getScale());
     
     // シャドウマップのテクスチャユニットを指定する
     glUniform1i(depthLoc, 1);
