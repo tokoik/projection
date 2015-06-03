@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(0);
+  cv::VideoCapture camera(1);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
@@ -116,7 +116,7 @@ int main()
   const GLuint mtLoc(glGetUniformLocation(simple.get(), "mt"));
 
   // シャドウマップ作成用のシェーダを読み込む
-  GgSimpleShader shadow("simple.vert", "simple.frag");
+  GgPointShader shadow("shadow.vert", "shadow.frag");
 
   // シャドウマップ作成用のシェーダが読み込めたか確認する
   if (!shadow.get()) return 1;
@@ -128,29 +128,11 @@ int main()
   // 描画データの設定
   //
 
-  class ProjectedObj
-    : public GgObj
-  {
-  public:
-
-    // コンストラクタ
-    ProjectedObj(const char *name, bool normalize = false)
-      : GgObj(name, normalize) {}
-
-    // デストラクタ
-    virtual ~ProjectedObj() {}
-
-    // シャドウマップへの描画
-  };
-
   // 図形を読み込む
-  ProjectedObj obj(model, true);
+  GgObj obj(model, true);
   
   // 図形が読み込めたか確認する
   if (!obj.get()) return 1;
-
-  // 読み込んだ図形を描くシェーダを指定する
-  obj.attachShader(simple);
 
   //
   // OpenGL の設定
@@ -203,6 +185,10 @@ int main()
   glBindFramebuffer(GL_FRAMEBUFFER, fb);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE, depth, 0);
 
+  // シャドウマップ用の変換行列
+  const GgMatrix mt(window.getMp() * window.getMv());
+
+  // シャドウマップの
   //
   // 描画
   //
@@ -231,6 +217,11 @@ int main()
     // デプスバッファだけを消去する
     glClear(GL_DEPTH_BUFFER_BIT);
 
+    // フレームバッファオブジェクトに描画する
+    shadow.use();
+    obj.attachShader(nullptr);
+    obj.draw();
+
     // 描画先を通常のフレームバッファに切り替える
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -242,10 +233,13 @@ int main()
     window.clear();
 
     // シェーダを選択する
-    obj.getShader()->use(light, window.getMp(), window.getMv() * window.getLtb());
+    simple.use(light, window.getMp(), window.getMv() * window.getLtb());
+
+    // 図形を描くシェーダを指定する
+    obj.attachShader(simple);
 
     // テクスチャ変換行列を設定する
-    glUniformMatrix4fv(mtLoc, 1, GL_TRUE, window.getRtb());
+    glUniformMatrix4fv(mtLoc, 1, GL_FALSE, mt.get());
 
     // 投影する映像のテクスチャユニットを指定する
     glUniform1i(imageLoc, 0);

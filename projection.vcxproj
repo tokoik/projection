@@ -89,6 +89,8 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shadow.frag" />
+    <None Include="shadow.vert" />
     <None Include="simple.frag" />
     <None Include="simple.vert" />
   </ItemGroup>

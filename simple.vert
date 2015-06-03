@@ -47,7 +47,7 @@ void main(void)
   ispec = pow(max(dot(n, h), 0.0), kshi) * kspec * lspec;
 
   // テクスチャ座標
-  texcoord = mc * mt * pv;
+  texcoord = mt * pv;
 
   gl_Position = mc * pv;
 }

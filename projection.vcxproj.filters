@@ -43,5 +43,11 @@
     <None Include="simple.vert">
       <Filter>シェーダー ファイル</Filter>
     </None>
+    <None Include="shadow.frag">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="shadow.vert">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
   </ItemGroup>
 </Project>
