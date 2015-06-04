@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(1);
+  cv::VideoCapture camera(0);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
@@ -83,7 +83,7 @@ int main()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // ウィンドウを作成する
-  Window window("Projection Mapping Simulator", capture_width, capture_height);
+  Window window("Projection Mapping Simulator", 800, 800);
 
   // ウィンドウが作成できたか確認する
   if (!window.get())
@@ -136,7 +136,7 @@ int main()
   //
 
   // 背景色を指定する
-  glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+  glClearColor(0.2f, 0.3f, 0.4f, 0.0f);
 
   // 隠面消去を有効にする
   glEnable(GL_CULL_FACE);
@@ -152,7 +152,7 @@ int main()
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-  // テクスチャの境界色を指定する
+  // テクスチャの境界色を指定する (環境光強度として使う)
   const GLfloat borderColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
   glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderColor);
 
@@ -186,8 +186,8 @@ int main()
   // 描画
   //
 
-  // 視野変換行列
-  const GgMatrix mv(ggLookat(0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f));
+  // 視野変換行列 (光源の位置, 光源の位置の初期値を兼ねる)
+  const GgMatrix mv(ggLookat(light.position[0], light.position[1], light.position[2], 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f));
 
   // 投影像のアスペクト比
   const GLfloat aspect(GLfloat(capture_width) / GLfloat(capture_height));
