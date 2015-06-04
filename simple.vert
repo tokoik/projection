@@ -1,9 +1,6 @@
 #version 150 core
 #extension GL_ARB_explicit_attrib_location : enable
 
-// シャドウマップ
-uniform sampler2DRectShadow shadow;
-
 // 投影像のテクスチャ
 uniform sampler2DRect image;
 
@@ -33,15 +30,15 @@ layout (location = 1) in vec4 nv;                   // 頂点の法線ベクトル
 out vec4 iamb;                                      // 環境光の反射光強度
 out vec4 idiff;                                     // 拡散反射光強度
 out vec4 ispec;                                     // 鏡面反射光強度
-out vec2 tcoord;                                    // 投影像のテクスチャ座標
-out vec3 scoord;                                    // シャドウマップのテクスチャ座標
+out vec3 texcoord;                                  // 投影像とシャドウマップのテクスチャ座標
 
 void main(void)
 {
   // 座標計算
   vec4 p = mw * pv;                                 // 視点座標系の頂点の位置
+  vec4 q = mw * pl;                                 // 視点座標系の光源の位置
   vec3 v = normalize(p.xyz / p.w);                  // 視線ベクトル
-  vec3 l = normalize((pl * p.w - p * pl.w).xyz);    // 光線ベクトル
+  vec3 l = normalize((q * p.w - p * q.w).xyz);      // 光線ベクトル
   vec3 n = normalize((mg * nv).xyz);                // 法線ベクトル
   vec3 h = normalize(l - v);                        // 中間ベクトル
 
@@ -53,11 +50,8 @@ void main(void)
   // 投影像のスクリーン座標
   vec4 t = mt * pv;
 
-  // 投影像のテクスチャ座標
-  tcoord = textureSize(image) * (t.xy / t.w + 0.5);
-  
-  // シャドウマップのテクスチャ座標
-  scoord = vec3(tcoord, t.z / t.w);
+  // 投影像とシャドウマップのテクスチャ座標
+  texcoord = vec3(textureSize(image), 1.0) * (t.xyz / t.w + 1.0) * 0.5;
   
   gl_Position = mc * pv;
 }

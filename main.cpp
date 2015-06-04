@@ -26,7 +26,7 @@ const GgSimpleShader::Light light =
   { 0.2f, 0.2f, 0.2f, 1.0f },
   { 1.0f, 1.0f, 1.0f, 1.0f },
   { 1.0f, 1.0f, 1.0f, 1.0f },
-  { 0.0f, 0.0f, 0.0f, 1.0f }
+  { 0.0f, 0.0f, 5.0f, 1.0f }
 };
 
 //
@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(0);
+  cv::VideoCapture camera(1);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
@@ -113,13 +113,13 @@ int main()
   const GLuint mtLoc(glGetUniformLocation(simple.get(), "mt"));
 
   // シャドウマップ作成用のシェーダを読み込む
-  GgPointShader shadow("shadow.vert", "shadow.frag");
+  GgSimpleShader shadow("shadow.vert", "shadow.frag");
 
   // シャドウマップ作成用のシェーダが読み込めたか確認する
   if (!shadow.get()) return 1;
 
   // シャドウマップ作成用の変換行列の場所を取り出す
-  const GLuint msLoc(glGetUniformLocation(simple.get(), "ms"));
+  const GLuint msLoc(glGetUniformLocation(shadow.get(), "ms"));
 
   //
   // 描画データの設定
@@ -182,13 +182,15 @@ int main()
   glBindFramebuffer(GL_FRAMEBUFFER, fb);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE, depth, 0);
 
-  // シャドウマップ用の変換行列
-  const GgMatrix mt(window.getMp() * window.getMv());
-
-  // シャドウマップの
   //
   // 描画
   //
+
+  // 視野変換行列
+  const GgMatrix mv(ggLookat(0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f));
+
+  // 投影像のアスペクト比
+  const GLfloat aspect(GLfloat(capture_width) / GLfloat(capture_height));
 
   // ウィンドウが開いている間繰り返す
   while (window.shouldClose() == GL_FALSE)
@@ -204,9 +206,9 @@ int main()
       glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, frame.cols, frame.rows, GL_BGR, GL_UNSIGNED_BYTE, frame.data);
     }
 
-    // スケーリングしたシャドウマップの変換行列
-    const GgMatrix ms(ggScale(window.getScale(), -window.getScale(), 1.0) * mt);
-    
+    // シャドウマッピング用の変換行列
+    const GgMatrix ms(ggPerspective(window.getScale() * 0.01f + 0.3f, aspect, 3.2f, 6.8f) * mv);
+
     // 描画先をフレームバッファオブジェクトに切り替える
     glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
@@ -216,21 +218,23 @@ int main()
 
     // デプスバッファだけを消去する
     glClear(GL_DEPTH_BUFFER_BIT);
-    
+
     // ビューポートをシャドウマップのサイズに設定する
     glViewport(0, 0, capture_width, capture_height);
 
     // シャドウマップ用のシェーダを選択する
     shadow.use();
     
-    // シャドウマップ用のテクスチャ変換行列を設定する
+    // シャドウマップ用の投影変換行列を設定する
     glUniformMatrix4fv(msLoc, 1, GL_FALSE, ms.get());
     
     // オブジェクトのマテリアル設定は行わない
     obj.attachShader(nullptr);
 
-    // シャドウマップ用のフレームバッファオブジェクトに描画する
+    // 背面ポリゴンだけをシャドウマップ用のフレームバッファオブジェクトに描画する
+    glCullFace(GL_FRONT);
     obj.draw();
+    glCullFace(GL_BACK);
 
     // 描画先を通常のフレームバッファに切り替える
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -243,12 +247,12 @@ int main()
     window.clear();
 
     // 描画用のシェーダを選択する
-    simple.use(light, window.getMp(), window.getMv() * window.getLtb());
+    simple.use(light, window.getMp(), mv * window.getLtb());
 
     // オブジェクトのマテリアル設定を行う
     obj.attachShader(simple);
     
-    // 投影像のテクスチャ変換行列を設定する
+    // シャドウマップ用の投影変換行列をスケーリングして投影像のテクスチャ変換行列として使う
     glUniformMatrix4fv(mtLoc, 1, GL_FALSE, ms.get());
 
     // 投影する映像のテクスチャユニットを指定する

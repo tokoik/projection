@@ -47,9 +47,6 @@ Window::Window(const char *title, int width, int height)
 
   // ウィンドウの設定を初期化する
   resize(window, width, height);
-
-  // 視野変換行列を設定する
-  mv.loadTranslate(0.0f, 0.0f, -5.0f);
 }
 
 //
@@ -249,7 +246,7 @@ void Window::wheel(GLFWwindow *window, double x, double y)
     else
     {
       // 上下に移動する
-      instance->scale += 0.01 * y;
+      instance->scale += y;
     }
   }
 }

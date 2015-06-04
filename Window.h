@@ -12,10 +12,7 @@ class Window
 	// ウィンドウの識別子
 	GLFWwindow *const window;
 
-  // 視野変換行列
-  GgMatrix mv;
-
-  // 影変換行列
+  // 投影変換行列
 	GgMatrix mp;
 
   // トラックボール処理
@@ -102,14 +99,6 @@ public:
   //   ・マウスホイールを操作した時にコールバック関数として呼び出される
   //
   static void wheel(GLFWwindow *window, double x, double y);
-
-  //
-  // 視野変換行列を得る
-  //
-  const GgMatrix &getMv() const
-  {
-    return mv;
-  }
 
   //
   // 投影変換行列を得る
