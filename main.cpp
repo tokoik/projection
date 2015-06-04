@@ -207,7 +207,7 @@ int main()
     }
 
     // シャドウマッピング用の変換行列
-    const GgMatrix ms(ggPerspective(window.getScale() * 0.01f + 0.3f, aspect, 3.2f, 6.8f) * mv);
+    const GgMatrix ms(ggPerspective(window.getZoom() * 0.01f + 0.3f, aspect, 3.2f, 6.8f) * mv);
 
     // 描画先をフレームバッファオブジェクトに切り替える
     glBindFramebuffer(GL_FRAMEBUFFER, fb);

@@ -16,10 +16,16 @@
 //    height: 開くウィンドウの高さ
 //
 Window::Window(const char *title, int width, int height)
-  : window(glfwCreateWindow(width, height, title, NULL, NULL)) , key(0), scale(1.5)
+  : window(glfwCreateWindow(width, height, title, NULL, NULL))
 {
   // ウィンドウが作成できなかったらそのまま戻る
   if (window == NULL) return;
+
+  // タイプしたキーの初期値を設定する
+  key = 0;
+
+  // 投影像のズームファクタの初期値
+  zoom = 1.5;
 
   // 現在のウィンドウを処理対象にする
   glfwMakeContextCurrent(window);
@@ -246,7 +252,7 @@ void Window::wheel(GLFWwindow *window, double x, double y)
     else
     {
       // 上下に移動する
-      instance->scale += y;
+      instance->zoom += y;
     }
   }
 }

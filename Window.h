@@ -21,8 +21,8 @@ class Window
   // ビューポートのサイズ
   int width, height;
   
-  // 投影像のスケール
-  double scale;
+  // 投影像のズームファクタ
+  double zoom;
   
 	// タイプしたキー
 	int key;
@@ -126,9 +126,9 @@ public:
 
   //
   // 現在のスケールを取り出す
-  GLfloat getScale() const
+  GLfloat getZoom() const
   {
-    return GLfloat(scale);
+    return GLfloat(zoom);
   }
 
   //
