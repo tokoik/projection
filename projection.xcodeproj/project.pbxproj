@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D95A28A1B21D1F500503BE6 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 7D95A2891B21D1F500503BE6 /* README.md */; };
 		7DEEEA061B17119800E9B87D /* gg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DEEEA041B17119800E9B87D /* gg.cpp */; };
 		7DEEEA081B1711B400E9B87D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DEEEA071B1711B400E9B87D /* main.cpp */; };
 		7DEEEA0A1B1711C200E9B87D /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DEEEA091B1711C200E9B87D /* Window.cpp */; };
@@ -29,6 +30,7 @@
 		7D8D4C401B1F2B46001B220F /* shadow.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = shadow.vert; sourceTree = SOURCE_ROOT; };
 		7D95A2871B21D0E900503BE6 /* box.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = box.obj; sourceTree = "<group>"; };
 		7D95A2881B21D0E900503BE6 /* bunny.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bunny.obj; sourceTree = "<group>"; };
+		7D95A2891B21D1F500503BE6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		7DA674F21B1710B700955A94 /* projection */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = projection; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DA674FC1B17111F00955A94 /* box.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = box.mtl; sourceTree = SOURCE_ROOT; };
 		7DA674FD1B17111F00955A94 /* bunny.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bunny.mtl; sourceTree = SOURCE_ROOT; };
@@ -55,6 +57,7 @@
 		7DA674E91B1710B700955A94 = {
 			isa = PBXGroup;
 			children = (
+				7D95A2891B21D1F500503BE6 /* README.md */,
 				7DA674F41B1710B700955A94 /* projection */,
 				7DA674F31B1710B700955A94 /* Products */,
 				7D95A2871B21D0E900503BE6 /* box.obj */,
@@ -146,6 +149,7 @@
 			files = (
 				7DEEEA081B1711B400E9B87D /* main.cpp in Sources */,
 				7DEEEA0A1B1711C200E9B87D /* Window.cpp in Sources */,
+				7D95A28A1B21D1F500503BE6 /* README.md in Sources */,
 				7DEEEA061B17119800E9B87D /* gg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
