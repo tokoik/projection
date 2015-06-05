@@ -27,6 +27,8 @@
 /* Begin PBXFileReference section */
 		7D8D4C3F1B1F2B46001B220F /* shadow.frag */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = shadow.frag; sourceTree = SOURCE_ROOT; };
 		7D8D4C401B1F2B46001B220F /* shadow.vert */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.glsl; lineEnding = 0; path = shadow.vert; sourceTree = SOURCE_ROOT; };
+		7D95A2871B21D0E900503BE6 /* box.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = box.obj; sourceTree = "<group>"; };
+		7D95A2881B21D0E900503BE6 /* bunny.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bunny.obj; sourceTree = "<group>"; };
 		7DA674F21B1710B700955A94 /* projection */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = projection; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DA674FC1B17111F00955A94 /* box.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = box.mtl; sourceTree = SOURCE_ROOT; };
 		7DA674FD1B17111F00955A94 /* bunny.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bunny.mtl; sourceTree = SOURCE_ROOT; };
@@ -55,6 +57,10 @@
 			children = (
 				7DA674F41B1710B700955A94 /* projection */,
 				7DA674F31B1710B700955A94 /* Products */,
+				7D95A2871B21D0E900503BE6 /* box.obj */,
+				7DA674FC1B17111F00955A94 /* box.mtl */,
+				7D95A2881B21D0E900503BE6 /* bunny.obj */,
+				7DA674FD1B17111F00955A94 /* bunny.mtl */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,8 +84,6 @@
 				7D8D4C3F1B1F2B46001B220F /* shadow.frag */,
 				7DEEEA0D1B1711DF00E9B87D /* simple.vert */,
 				7DEEEA0C1B1711DF00E9B87D /* simple.frag */,
-				7DA674FC1B17111F00955A94 /* box.mtl */,
-				7DA674FD1B17111F00955A94 /* bunny.mtl */,
 			);
 			path = projection;
 			sourceTree = "<group>";
