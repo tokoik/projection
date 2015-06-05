@@ -56,7 +56,7 @@ int main()
     return 1;
   }
   
-  // カメラの初期設定
+  // 入力画像のサイズを取得する
   camera.grab();
   const GLsizei capture_width(GLsizei(camera.get(CV_CAP_PROP_FRAME_WIDTH)));
   const GLsizei capture_height(GLsizei(camera.get(CV_CAP_PROP_FRAME_HEIGHT)));
@@ -156,11 +156,14 @@ int main()
   const GLfloat borderColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
   glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-  // シャドウマップを取得する FBO 用のテクスチャを準備する
+  // FBO のサイズはキャプチャ画像の 1 / 4 にする
+  const GLsizei fbo_width(capture_width / 4), fbo_height(capture_height / 4);
+  
+  // シャドウマップを作成する FBO 用のテクスチャを準備する
   GLuint depth;
   glGenTextures(1, &depth);
   glBindTexture(GL_TEXTURE_RECTANGLE, depth);
-  glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT, capture_width, capture_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+  glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT, fbo_width, fbo_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -186,7 +189,7 @@ int main()
   // 描画
   //
 
-  // 視野変換行列 (光源の位置, 光源の位置の初期値を兼ねる)
+  // 視野変換行列 (視点の位置の初期値を光源の位置にする)
   const GgMatrix mv(ggLookat(light.position[0], light.position[1], light.position[2], 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f));
 
   // 投影像のアスペクト比
@@ -219,8 +222,8 @@ int main()
     // デプスバッファだけを消去する
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    // ビューポートをシャドウマップのサイズに設定する
-    glViewport(0, 0, capture_width, capture_height);
+    // ビューポートを FBO のサイズに設定する
+    glViewport(0, 0, fbo_width, fbo_height);
 
     // シャドウマップ用のシェーダを選択する
     shadow.use();
@@ -228,7 +231,7 @@ int main()
     // シャドウマップ用の投影変換行列を設定する
     glUniformMatrix4fv(msLoc, 1, GL_FALSE, ms.get());
     
-    // オブジェクトのマテリアル設定は行わない
+    // シャドウマップを作成する際はオブジェクトのマテリアル設定を行わない
     obj.attachShader(nullptr);
 
     // 背面ポリゴンだけをシャドウマップ用のフレームバッファオブジェクトに描画する
@@ -252,7 +255,7 @@ int main()
     // オブジェクトのマテリアル設定を行う
     obj.attachShader(simple);
     
-    // シャドウマップ用の投影変換行列をスケーリングして投影像のテクスチャ変換行列として使う
+    // シャドウマップの作成に使った投影変換行列を投影像のテクスチャ変換行列に使う
     glUniformMatrix4fv(mtLoc, 1, GL_FALSE, ms.get());
 
     // 投影する映像のテクスチャユニットを指定する

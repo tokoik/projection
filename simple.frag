@@ -18,6 +18,9 @@ layout (location = 0) out vec4 fc;                  // フラグメントの色
 
 void main(void)
 {
+  // 投影像に使うキャプチャ画像は上下が反転しているのでテクスチャ座標を上下反転する
   vec2 t = vec2(texcoord.x, textureSize(image).y - texcoord.y);
+  
+  // 光源に用いる投影像の画素値を光源強度としてもちいる
   fc = iamb + (idiff + ispec) * texture(image, t) * texture(depth, texcoord);
 }

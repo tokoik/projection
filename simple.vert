@@ -50,7 +50,7 @@ void main(void)
   // 投影像のスクリーン座標
   vec4 t = mt * pv;
 
-  // 投影像とシャドウマップのテクスチャ座標
+  // 投影像とシャドウマップのテクスチャ座標はスクリーン座標に 1 を足して 2 で割る
   texcoord = vec3(textureSize(image), 1.0) * (t.xyz / t.w + 1.0) * 0.5;
   
   gl_Position = mc * pv;

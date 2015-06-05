@@ -9,5 +9,6 @@ layout (location = 0) in vec4 pv;                   // ローカル座標系の頂点位置
 
 void main(void)
 {
+  // シャドウマップの作成時には陰影付け等は行わないので座標変換だけを行う
   gl_Position = ms * pv;
 }
