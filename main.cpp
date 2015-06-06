@@ -152,7 +152,7 @@ int main()
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-  // テクスチャの境界色を指定する (環境光強度として使う)
+  // テクスチャの境界色を指定する (投影像の外側の漏洩光の強度として使う)
   const GLfloat borderColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
   glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderColor);
 
@@ -169,7 +169,7 @@ int main()
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-  // テクスチャの境界深度を指定する (最初の要素が使われる)
+  // テクスチャの境界深度を指定する (最初の要素がデプステクスチャの外側の深度として使われる)
   const GLfloat borderDepth[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderDepth);
 
@@ -217,7 +217,6 @@ int main()
 
     // カラーバッファは無いので読み書きしない
     glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
 
     // デプスバッファだけを消去する
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -242,9 +241,8 @@ int main()
     // 描画先を通常のフレームバッファに切り替える
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // カラーバッファへの読み書きを有効にする
+    // カラーバッファへの読み書きを有効にする (ダブルバッファリングなのでバックバッファに描く)
     glDrawBuffer(GL_BACK);
-    glReadBuffer(GL_BACK);
 
     // 画面を消去する
     window.clear();
