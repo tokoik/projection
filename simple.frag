@@ -18,9 +18,12 @@ layout (location = 0) out vec4 fc;                  // フラグメントの色
 
 void main(void)
 {
+  // シャドウマップのテクスチャ座標を求める
+  vec3 s = vec3(textureSize(depth), 1.0) * texcoord;
+
   // 投影像に使うキャプチャ画像は上下が反転しているのでテクスチャ座標を上下反転する
-  vec2 t = vec2(texcoord.x, textureSize(image).y - texcoord.y);
+  vec2 t = textureSize(image) * vec2(texcoord.x, 1.0 - texcoord.y);
   
   // 光源に用いる投影像の画素値を光源強度としてもちいる
-  fc = iamb + (idiff + ispec) * texture(image, t) * texture(depth, texcoord);
+  fc = iamb + (idiff + ispec) * texture(depth, s) * texture(image, t);
 }

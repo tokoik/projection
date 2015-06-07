@@ -156,8 +156,8 @@ int main()
   const GLfloat borderColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
   glTexParameterfv(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-  // FBO のサイズはキャプチャ画像の 1 / 4 にする
-  const GLsizei fbo_width(capture_width / 4), fbo_height(capture_height / 4);
+  // FBO のサイズはキャプチャ画像と同じにする
+  const GLsizei fbo_width(capture_width), fbo_height(capture_height);
   
   // シャドウマップを作成する FBO 用のテクスチャを準備する
   GLuint depth;

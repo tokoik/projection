@@ -1,9 +1,6 @@
 #version 150 core
 #extension GL_ARB_explicit_attrib_location : enable
 
-// 投影像のテクスチャ
-uniform sampler2DRect image;
-
 // 光源
 uniform vec4 lamb;                                  // 環境光成分
 uniform vec4 ldiff;                                 // 拡散反射光成分
@@ -51,7 +48,7 @@ void main(void)
   vec4 t = mt * pv;
 
   // 投影像とシャドウマップのテクスチャ座標はスクリーン座標に 1 を足して 2 で割る
-  texcoord = vec3(textureSize(image), 1.0) * (t.xyz / t.w + 1.0) * 0.5;
+  texcoord = (t.xyz / t.w + 1.0) * 0.5;
   
   gl_Position = mc * pv;
 }
