@@ -48,7 +48,7 @@ int main()
   //
 
   // OpenCV によるビデオキャプチャを初期化する
-  cv::VideoCapture camera(1);
+  cv::VideoCapture camera(0);
   if (!camera.isOpened())
   {
     // カメラが使えなかった
