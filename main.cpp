@@ -1,16 +1,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <opencv2/highgui/highgui.hpp>
-#ifdef _WIN32
-#  define CV_VERSION_STR CVAUX_STR(CV_MAJOR_VERSION) CVAUX_STR(CV_MINOR_VERSION) CVAUX_STR(CV_SUBMINOR_VERSION)
-#  ifdef _DEBUG
-#    define CV_EXT_STR "d.lib"
-#  else
-#    define CV_EXT_STR ".lib"
-#  endif
-#  pragma comment(lib, "opencv_core" CV_VERSION_STR CV_EXT_STR)
-#  pragma comment(lib, "opencv_highgui" CV_VERSION_STR CV_EXT_STR)
-#endif
 
 //
 // ウィンドウ関連の処理
