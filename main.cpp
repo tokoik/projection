@@ -10,6 +10,7 @@
 #  endif
 #  pragma comment(lib, "opencv_core" CV_VERSION_STR CV_EXT_STR)
 #  pragma comment(lib, "opencv_highgui" CV_VERSION_STR CV_EXT_STR)
+#  pragma comment(lib, "opencv_videoio" CV_VERSION_STR CV_EXT_STR)
 #endif
 
 //
