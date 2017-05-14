@@ -2,6 +2,7 @@
 # for Linux
 #
 *.o
+*.dep
 core
 a.out
 projection
@@ -22,14 +23,16 @@ Thumbs.db
 *.exe
 *.ncb
 *.suo
-*.sdf
-*.opensdf
-Debug/
-Release/
-ipch/
-*.dep
+*.db
+*.opendb
+/Debug/
+/Release/
+/x64/
+/packages/
 #
 # anothre stuff
 #
-*~
+*.tmp
+*.swp
 *.bak
+*~
