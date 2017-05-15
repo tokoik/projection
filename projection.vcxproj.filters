@@ -49,5 +49,6 @@
     <None Include="shadow.vert">
       <Filter>シェーダー ファイル</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

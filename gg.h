@@ -27,21 +27,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #if defined(_WIN32)
 #  pragma warning(disable:4996)
-#  if defined(_DEBUG)
-#    define GLFW3_EXT_STR "d.lib"
-#  else
-#    define GLFW3_EXT_STR ".lib"
+#  if !defined(_DEBUG)
 #    pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
-#  endif
-#  if defined(_WIN64)
-#    pragma comment(lib, "glfw3-64" GLFW3_EXT_STR)
-#  else
-#    pragma comment(lib, "glfw3" GLFW3_EXT_STR)
 #  endif
 #  pragma comment(lib, "opengl32.lib")
 #  define _USE_MATH_DEFINES
 #  define NOMINMAX
-#  include "glfw3.h"
+#  include <GLFW/glfw3.h>
 #  include "glext.h"
 extern PFNGLACCUMXOESPROC glAccumxOES;
 extern PFNGLACTIVEPROGRAMEXTPROC glActiveProgramEXT;

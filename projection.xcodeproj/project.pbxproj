@@ -261,6 +261,7 @@
 					Cocoa,
 					"-lopencv_core",
 					"-lopencv_highgui",
+					"-lopencv_videoio",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -292,6 +293,7 @@
 					Cocoa,
 					"-lopencv_core",
 					"-lopencv_highgui",
+					"-lopencv_videoio",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
