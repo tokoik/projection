@@ -14,8 +14,23 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="シェーダー ファイル">
-      <UniqueIdentifier>{d7f27dad-a58a-4e3d-a333-fe92c6407a42}</UniqueIdentifier>
+      <UniqueIdentifier>{0e0d4a6c-3f5d-49a5-83f5-f2f7c0f77d74}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="shadow.frag">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="shadow.vert">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="simple.frag">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="simple.vert">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gg.cpp">
@@ -35,20 +50,5 @@
     <ClInclude Include="Window.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="simple.frag">
-      <Filter>シェーダー ファイル</Filter>
-    </None>
-    <None Include="simple.vert">
-      <Filter>シェーダー ファイル</Filter>
-    </None>
-    <None Include="shadow.frag">
-      <Filter>シェーダー ファイル</Filter>
-    </None>
-    <None Include="shadow.vert">
-      <Filter>シェーダー ファイル</Filter>
-    </None>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

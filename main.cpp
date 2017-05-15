@@ -1,17 +1,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <opencv2/highgui/highgui.hpp>
-#ifdef _WIN32
-#  define CV_VERSION_STR CVAUX_STR(CV_MAJOR_VERSION) CVAUX_STR(CV_MINOR_VERSION) CVAUX_STR(CV_SUBMINOR_VERSION)
-#  ifdef _DEBUG
-#    define CV_EXT_STR "d.lib"
-#  else
-#    define CV_EXT_STR ".lib"
-#  endif
-#  pragma comment(lib, "opencv_core" CV_VERSION_STR CV_EXT_STR)
-#  pragma comment(lib, "opencv_highgui" CV_VERSION_STR CV_EXT_STR)
-#  pragma comment(lib, "opencv_videoio" CV_VERSION_STR CV_EXT_STR)
-#endif
 
 //
 // ウィンドウ関連の処理
@@ -203,7 +192,7 @@ int main()
     {
       // キャプチャ映像から画像を切り出す
       cv::Mat frame;
-      camera.retrieve(frame, 3);
+      camera.retrieve(frame);
 
       // 切り出した画像をテクスチャに転送する
       glBindTexture(GL_TEXTURE_RECTANGLE, image);

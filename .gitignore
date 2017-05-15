@@ -1,20 +1,29 @@
 #
 # for Linux
 #
+projection
+a.out
+core
 *.o
 *.dep
-core
-a.out
-projection
 #
 # for Mac
 #
+/build/
+/DerivedData/
+xcuserdata
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+*.moved-aside
+*.xcuserstate
+*.xccheckout
 .DS_Store
-*.xcodeproj/*
-!project.pbxproj
-*.xcuserdatad/
-build/
-DerivedData/
 #
 # for Windows
 #
@@ -23,8 +32,10 @@ Thumbs.db
 *.exe
 *.ncb
 *.suo
-*.db
-*.opendb
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
 /Debug/
 /Release/
 /x64/
