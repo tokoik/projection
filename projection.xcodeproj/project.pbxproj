@@ -250,7 +250,7 @@
 					/usr/local/lib,
 				);
 				OTHER_LDFLAGS = (
-					libglfw3_macos.a,
+					"-lglfw",
 					"-framework",
 					OpenGL,
 					"-framework",
@@ -282,7 +282,7 @@
 					/usr/local/lib,
 				);
 				OTHER_LDFLAGS = (
-					libglfw3_macos.a,
+					"-lglfw",
 					"-framework",
 					OpenGL,
 					"-framework",

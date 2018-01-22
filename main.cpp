@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdlib>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 
 //
 // ウィンドウ関連の処理

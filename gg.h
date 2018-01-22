@@ -2506,7 +2506,7 @@ extern PFNGLWINDOWPOS4SVMESAPROC glWindowPos4svMESA;
 extern PFNGLWRITEMASKEXTPROC glWriteMaskEXT;
 #elif defined(__APPLE__)
 #  define GLFW_INCLUDE_GLCOREARB
-#  include "glfw3.h"
+#  include <GLFW/glfw3.h>
 #  include <OpenGL/gl3ext.h>
 #elif defined(X11)
 #  define GL_GLEXT_PROTOTYPES
