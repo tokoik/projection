@@ -16,43 +16,38 @@
 //    height: 開くウィンドウの高さ
 //
 Window::Window(const char *title, int width, int height)
-  : window(glfwCreateWindow(width, height, title, NULL, NULL))
+	: window(glfwCreateWindow(width, height, title, NULL, NULL))
+	, ox(0.0f), oy(0.0f), oz(0.0f), key(0), mm(ggIdentity()), zoom(0.0)
 {
-  // ウィンドウが作成できなかったらそのまま戻る
-  if (window == NULL) return;
+	// ウィンドウが作成できなかったらそのまま戻る
+	if (window == NULL) return;
 
-  // タイプしたキーの初期値を設定する
-  key = 0;
+	// 現在のウィンドウを処理対象にする
+	glfwMakeContextCurrent(window);
 
-  // 投影像のズームファクタの初期値
-  zoom = 1.5;
+	// 作成したウィンドウに対する設定
+	glfwSwapInterval(1);
 
-  // 現在のウィンドウを処理対象にする
-  glfwMakeContextCurrent(window);
+	// ゲームグラフィックス特論の都合にもとづく初期化
+	ggInit();
 
-  // 作成したウィンドウに対する設定
-  glfwSwapInterval(1);
+	// このインスタンスの this ポインタを記録しておく
+	glfwSetWindowUserPointer(window, this);
 
-  // ゲームグラフィックス特論の都合にもとづく初期化
-  ggInit();
+	// キーボード操作時に呼び出す処理の登録
+	glfwSetKeyCallback(window, keyboard);
 
-  // このインスタンスの this ポインタを記録しておく
-  glfwSetWindowUserPointer(window, this);
+	// マウスボタン操作時に呼び出す処理の登録
+	glfwSetMouseButtonCallback(window, mouse);
 
-  // キーボード操作時に呼び出す処理の登録
-  glfwSetKeyCallback(window, keyboard);
+	// マウスホイール操作時に呼び出す処理の登録
+	glfwSetScrollCallback(window, wheel);
 
-  // マウスボタン操作時に呼び出す処理の登録
-  glfwSetMouseButtonCallback(window, mouse);
+	// ウィンドウのサイズ変更時に呼び出す処理を登録する
+	glfwSetFramebufferSizeCallback(window, resize);
 
-  // マウスホイール操作時に呼び出す処理の登録
-  glfwSetScrollCallback(window, wheel);
-
-  // ウィンドウのサイズ変更時に呼び出す処理を登録する
-  glfwSetFramebufferSizeCallback(window, resize);
-
-  // ウィンドウの設定を初期化する
-  resize(window, width, height);
+	// ウィンドウの設定を初期化する
+	resize(window, width, height);
 }
 
 //
@@ -60,7 +55,7 @@ Window::Window(const char *title, int width, int height)
 //
 Window::~Window()
 {
-  glfwDestroyWindow(window);
+	glfwDestroyWindow(window);
 }
 
 //
@@ -70,7 +65,7 @@ Window::~Window()
 //
 int Window::shouldClose() const
 {
-  return glfwWindowShouldClose(window) | glfwGetKey(window, GLFW_KEY_ESCAPE);
+	return glfwWindowShouldClose(window) | glfwGetKey(window, GLFW_KEY_ESCAPE);
 }
 
 //
@@ -81,11 +76,11 @@ int Window::shouldClose() const
 //
 void Window::clear()
 {
-  // ビューポートを設定する
-  glViewport(0, 0, width, height);
+	// ビューポートを設定する
+	glViewport(0, 0, width, height);
 
-  // 画面クリア
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// 画面クリア
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 //
@@ -97,36 +92,36 @@ void Window::clear()
 //
 void Window::swapBuffers()
 {
-  // カラーバッファを入れ替える
-  glfwSwapBuffers(window);
+	// カラーバッファを入れ替える
+	glfwSwapBuffers(window);
 
-  // OpenGL のエラーをチェックする
-  ggError("SwapBuffers");
+	// OpenGL のエラーをチェックする
+	ggError("SwapBuffers");
 
-  // イベントを取り出す
-  glfwPollEvents();
+	// イベントを取り出す
+	glfwPollEvents();
 
-  // 左ボタンドラッグ
-  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
-  {
-    // マウスの現在位置を取得する
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
+	// 左ボタンドラッグ
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+	{
+		// マウスの現在位置を取得する
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
 
-    // トラックボール処理
-    ltb.motion(static_cast<float>(x), static_cast<float>(y));
-  }
+		// トラックボール処理
+		ltb.motion(static_cast<float>(x), static_cast<float>(y));
+	}
 
-  // 右ボタンドラッグ
-  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
-  {
-    // マウスの現在位置を取得する
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
+	// 右ボタンドラッグ
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+	{
+		// マウスの現在位置を取得する
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
 
-    // トラックボール処理
-    rtb.motion(static_cast<float>(x), static_cast<float>(y));
-  }
+		// トラックボール処理
+		rtb.motion(static_cast<float>(x), static_cast<float>(y));
+	}
 }
 
 //
@@ -137,25 +132,25 @@ void Window::swapBuffers()
 //
 void Window::resize(GLFWwindow *window, int width, int height)
 {
-  // ウィンドウ全体をビューポートにする
-  glViewport(0, 0, width, height);
+	// ウィンドウ全体をビューポートにする
+	glViewport(0, 0, width, height);
 
-  // このインスタンスの this ポインタを得る
-  Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
+	// このインスタンスの this ポインタを得る
+	Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
 
-  if (instance != NULL)
-  {
-    // ビューポートを保存する
-    instance->width = width;
-    instance->height = height;
-    
-    // 投影変換行列を設定する
-    instance->mp.loadPerspective(0.5f, (float)width / (float)height, 1.0f, 20.0f);
+	if (instance != NULL)
+	{
+		// ビューポートを保存する
+		instance->width = width;
+		instance->height = height;
 
-    // トラックボール処理の範囲を設定する
-    instance->ltb.region(width, height);
-    instance->rtb.region(width, height);
-  }
+		// 投影変換行列を設定する
+		instance->mp.loadPerspective(0.5f, (float)width / (float)height, 1.0f, 20.0f);
+
+		// トラックボール処理の範囲を設定する
+		instance->ltb.region(width, height);
+		instance->rtb.region(width, height);
+	}
 }
 
 //
@@ -165,17 +160,17 @@ void Window::resize(GLFWwindow *window, int width, int height)
 //
 void Window::keyboard(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-  if (action == GLFW_PRESS)
-  {
-    // このインスタンスの this ポインタを得る
-    Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
+	if (action == GLFW_PRESS)
+	{
+		// このインスタンスの this ポインタを得る
+		Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
 
-    if (instance != NULL)
-    {
-      // 押されたキーを保存する
-      instance->key = key;
-    }
-  }
+		if (instance != NULL)
+		{
+			// 押されたキーを保存する
+			instance->key = key;
+		}
+	}
 }
 
 //
@@ -185,51 +180,51 @@ void Window::keyboard(GLFWwindow *window, int key, int scancode, int action, int
 //
 void Window::mouse(GLFWwindow *window, int button, int action, int mods)
 {
-  // このインスタンスの this ポインタを得る
-  Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
+	// このインスタンスの this ポインタを得る
+	Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
 
-  if (instance)
-  {
-    // マウスの現在位置を取り出す
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
+	if (instance)
+	{
+		// マウスの現在位置を取り出す
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
 
-    // 押されたボタンの判定
-    switch (button)
-    {
-    case GLFW_MOUSE_BUTTON_1:
-      // 左ボタンを押した時の処理
-      if (action)
-      {
-        // トラックボール処理開始
-        instance->ltb.start(static_cast<float>(x), static_cast<float>(y));
-      }
-      else
-      {
-        // トラックボール処理終了
-        instance->ltb.stop(static_cast<float>(x), static_cast<float>(y));
-      }
-      break;
-    case GLFW_MOUSE_BUTTON_2:
-      // 右ボタンを押した時の処理
-      if (action)
-      {
-        // トラックボール処理開始
-        instance->rtb.start(static_cast<float>(x), static_cast<float>(y));
-      }
-      else
-      {
-        // トラックボール処理終了
-        instance->rtb.stop(static_cast<float>(x), static_cast<float>(y));
-      }
-      break;
-    case GLFW_MOUSE_BUTTON_3:
-      // 中ボタンを押した時の処理
-      break;
-    default:
-      break;
-    }
-  }
+		// 押されたボタンの判定
+		switch (button)
+		{
+		case GLFW_MOUSE_BUTTON_1:
+			// 左ボタンを押した時の処理
+			if (action)
+			{
+				// トラックボール処理開始
+				instance->ltb.start(static_cast<float>(x), static_cast<float>(y));
+			}
+			else
+			{
+				// トラックボール処理終了
+				instance->ltb.stop(static_cast<float>(x), static_cast<float>(y));
+			}
+			break;
+		case GLFW_MOUSE_BUTTON_2:
+			// 右ボタンを押した時の処理
+			if (action)
+			{
+				// トラックボール処理開始
+				instance->rtb.start(static_cast<float>(x), static_cast<float>(y));
+			}
+			else
+			{
+				// トラックボール処理終了
+				instance->rtb.stop(static_cast<float>(x), static_cast<float>(y));
+			}
+			break;
+		case GLFW_MOUSE_BUTTON_3:
+			// 中ボタンを押した時の処理
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 //
@@ -239,20 +234,39 @@ void Window::mouse(GLFWwindow *window, int button, int action, int mods)
 //
 void Window::wheel(GLFWwindow *window, double x, double y)
 {
-  // このインスタンスの this ポインタを得る
-  Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
+	// このインスタンスの this ポインタを得る
+	Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));
 
-  if (instance)
-  {
-    // 横の移動量が縦の移動量より大きければ
-    if (fabs(x) > fabs(y))
-    {
-      // 左右に移動する
-    }
-    else
-    {
-      // 上下に移動する
-      instance->zoom += y;
-    }
-  }
+	if (instance)
+	{
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT))
+		{
+			// 横の移動量が縦の移動量より大きければ
+			if (fabs(x) > fabs(y))
+			{
+				// 左右に移動する
+			}
+			else
+			{
+				// 上下に移動する
+				instance->zoom += y;
+			}
+		}
+		else
+		{
+			// マウスホイールによる視点の移動量を求める
+			const GLfloat move(GLfloat(0.05f * (fabs(instance->oz) + 1.0) * y));
+
+			// 視点の回転の変換行列を取り出す
+			const GLfloat *rotation(instance->ltb.get());
+
+			// 視点が向いている方向に移動する
+			instance->ox += rotation[8] * move;
+			instance->oy += rotation[9] * move;
+			instance->oz -= rotation[10] * move;
+
+			// モデル変換行列を更新する
+			instance->mm = ggTranslate(instance->ox, instance->oy, instance->oz);
+		}
+	}
 }
