@@ -22,15 +22,25 @@ in vec2 texcoord;
 layout (location = 0) out vec3 position;
 
 // デプス値をスケーリングする
-float s(in float z)
+vec2 s(in float z)
 {
-  return z == 0.0 ? DEPTH_MAXIMUM : z * DEPTH_SCALE;
+  return vec2(z, 1.0 - step(z, 0.0));
 }
 
 void main(void)
 {
   // デプス値を取り出す
-  float z = s(texture(depth, texcoord).r);
+  vec2 sum = s(texture(depth, texcoord).r);
+  sum += s(textureOffset(depth, texcoord, ivec2( 1,  0)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2(-1,  0)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2( 0,  1)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2( 0, -1)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2( 1,  1)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2(-1,  1)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2( 1, -1)).r);
+  sum += s(textureOffset(depth, texcoord, ivec2(-1, -1)).r);
+
+  float z = sum.x == 0.0 ? DEPTH_MAXIMUM : sum.x * DEPTH_SCALE / sum.y;
 
   // デプス値からカメラ座標値を求める
   position = vec3((texcoord - 0.5) * scale * z, z);

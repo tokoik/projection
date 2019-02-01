@@ -18,7 +18,7 @@
 #include "Calculate.h"
 
 // 頂点位置の生成をシェーダ (position.frag) で行うなら 1
-#define GENERATE_POSITION 0
+#define GENERATE_POSITION 1
 
 // 光源
 const GgSimpleShader::Light light =
